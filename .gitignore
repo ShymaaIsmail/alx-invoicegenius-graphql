@@ -1,2 +1,6 @@
 venv
 invoicesgenius/__pycache__
+invoices/__pycache__
+ai_parser/__pycache__
+ocr/__pycache__
+db.sqlite3
