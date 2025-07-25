@@ -1,2 +1,7 @@
 venv
-invoicesgenius/__pycache__
+db.sqlite3
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyo
+.env
