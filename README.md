@@ -3,7 +3,7 @@
 **ALX ProDev Backend – Project Nexus**  
 **Repository:** `alx-invoicegenius-graphql`  
 **Author:** [Shymaa M Ismail]  
-**Track:**AI, OCR, Django and GraphQL API Development
+**Track:** AI, OCR, Django and GraphQL API Development
 
 ---
 
