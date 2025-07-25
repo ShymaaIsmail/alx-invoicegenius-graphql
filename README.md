@@ -110,7 +110,7 @@ mutation {
 ## 🛠 Installation & Setup
 
 ```bash
-git clone https://github.com/yourusername/invoicegenius-graphql.git
+git clone https://github.com/ShymaaIsmail/invoicegenius-graphql.git
 cd invoicegenius-graphql
 
 python -m venv venv
@@ -178,5 +178,5 @@ celery -A invoicegenius worker -l info
 
 ## 📜 License
 
-Educational project for the **ALX ProDev Backend Program**  
+Educational Graduation project for the **ALX ProDev Backend Program**  
 © 2025 All rights reserved
