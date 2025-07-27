@@ -42,10 +42,13 @@ INSTALLED_APPS = [
     # Third-party apps
     'graphene_django',
     'django_celery_results',
+    'graphql_jwt.refresh_token',
     # Local apps
+    'authentication',
     'invoices',
     'ocr',
     'ai_parser',
+    'core',
 ]
 
 MIDDLEWARE = [
@@ -78,17 +81,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'invoicesgenius.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -117,6 +109,12 @@ DATABASES = {
         'PORT': config('DB_PORT', default='5432'),
     }
 }
+
+GRAPHENE = {
+    'SCHEMA': 'core.schema.schema',
+}
+
+GOOGLE_CLIENT_ID = config('GOOGLE_CLIENT_ID', default='your-google-client-id')
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/

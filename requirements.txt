@@ -49,3 +49,9 @@ django_celery_results==2.6.0
 django-filter==25.1
 python-decouple>=3.6
 psycopg2-binary==2.9.10
+google-auth==2.40.3
+django-graphql-jwt==0.4.0
+requests==2.32.4
+graphene-file-upload==1.3.0
+Pillow==10.0.0
+pytesseract==0.3.10
