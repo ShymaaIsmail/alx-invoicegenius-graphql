@@ -39,10 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Third-party apps
+
+    # Third-party
     'graphene_django',
-    'django_celery_results',
     'graphql_jwt.refresh_token',
+
     # Local apps
     'authentication',
     'invoices',
@@ -112,8 +113,30 @@ DATABASES = {
 
 GRAPHENE = {
     'SCHEMA': 'core.schema.schema',
+    'MIDDLEWARE': [
+        'graphql_jwt.middleware.JSONWebTokenMiddleware',
+    ],
+}
+GRAPHQL_JWT = {
+    "JWT_VERIFY_EXPIRATION": True,
+    "JWT_LONG_RUNNING_REFRESH_TOKEN": True,
+    "JWT_ALLOW_ANY_CLASSES": [
+        # Public-facing mutations that don't require auth (optional)
+        "graphql_jwt.mixins.ObtainJSONWebTokenMixin",
+        "graphql_jwt.mixins.VerifyMixin",
+        "graphql_jwt.mixins.RefreshMixin",
+    ],
 }
 
+AUTHENTICATION_BACKENDS = [
+    'graphql_jwt.backends.JSONWebTokenBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# CSRF settings
+CSRF_TRUSTED_ORIGINS = [
+    "chrome-extension://flnheeellpciglgpaodhkhmapeljopja"
+]
 GOOGLE_CLIENT_ID = config('GOOGLE_CLIENT_ID', default='your-google-client-id')
 
 # Internationalization

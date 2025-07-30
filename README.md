@@ -126,7 +126,12 @@ python manage.py runserver
 
 # In a new terminal (for background worker)
 celery -A invoicegenius worker -l info
+
+
+sudo apt install tesseract-ocr
+
 ```
+
 
 ---
 

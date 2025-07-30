@@ -12,7 +12,7 @@ class InvoiceQuery(graphene.ObjectType):
     @login_required
     def resolve_my_invoices(self, info):
         user = info.context.user
-        return Invoice.objects.filter(user=user).order_by('-created_at')
+        return Invoice.objects.filter(user=user).order_by('-uploaded_at')
 
     @login_required
     def resolve_invoice(self, info, id):

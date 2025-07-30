@@ -2,14 +2,32 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Invoice(models.Model):
+    STATUS_PENDING = 'pending'
+    STATUS_PROCESSING = 'processing'
+    STATUS_COMPLETED = 'completed'
+    STATUS_FAILED = 'failed'
+
+    STATUS_CHOICES = [
+        (STATUS_PENDING, 'Pending'),
+        (STATUS_PROCESSING, 'Processing'),
+        (STATUS_COMPLETED, 'Completed'),
+        (STATUS_FAILED, 'Failed'),
+    ]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='invoices')
     original_file = models.FileField(upload_to='invoices/')  # saved in media/invoices/
     uploaded_at = models.DateTimeField(auto_now_add=True)
     processed = models.BooleanField(default=False)  # OCR+AI done?
     processed_at = models.DateTimeField(null=True, blank=True)
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_PENDING,
+        help_text="Current status of the invoice"
+    )
 
     def __str__(self):
-        return f"Invoice {self.id} by {self.user.username} uploaded {self.uploaded_at}"
+        return f"Invoice {self.id} by {self.user.username} uploaded {self.uploaded_at} (status: {self.status})"
 
 class ParsedInvoiceData(models.Model):
     invoice = models.OneToOneField(Invoice, on_delete=models.CASCADE, related_name='parsed_data')

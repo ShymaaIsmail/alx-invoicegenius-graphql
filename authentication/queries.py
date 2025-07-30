@@ -8,4 +8,5 @@ class AuthQuery(graphene.ObjectType):
 
     @login_required
     def resolve_me(self, info):
+        print("Resolving 'me' query for user:", info.context.user)
         return info.context.user
