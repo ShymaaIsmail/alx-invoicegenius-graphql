@@ -3,7 +3,7 @@
 **ALX ProDev Backend – Project Nexus**  
 **Repository:** `alx-invoicegenius-graphql`  
 **Author:** [Shymaa M Ismail]  
-**Track:** AI, OCR, Django and GraphQL API Development
+**Track:** AI, OCR, Django, Celery and GraphQL API Development
 
 ---
 
@@ -50,7 +50,7 @@ This project showcases real-world backend engineering with asynchronous processi
 | AI Integration | OpenAI GPT-3.5 (via API) |
 | Background Tasks | Celery with Redis as broker |
 | Storage | Local filesystem (`media/`) |
-| Docs & Schema | GraphiQL Playground / Postman (auth only) |
+| Docs & Schema | GraphQL Playground / Google OAuth Background/ Altair (Mutations and Queries Collection) |
 
 ---
 
