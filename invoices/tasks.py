@@ -59,7 +59,7 @@ def process_invoice_file(invoice_id):
         total_amount=total.get("value"),
         tax_amount=tax.get("value"),
         currency=total.get("currency") or tax.get("currency"),
-        line_items= parsed_data.get("line_items")
+        line_items= parsed_data.get("line_items") or []
     )
 
         invoice.status = Invoice.STATUS_PROCESSED

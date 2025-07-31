@@ -18,35 +18,50 @@ def parse_invoice_text(text):
     logger.info(f"OPENAI_API_KEY loaded: {openai.api_key}")
 
     prompt = f"""
-You are a smart invoice parser. Your job is to extract key fields from OCR text that may come from **any country**, **any language**, and **any layout or format**.
+  You are a smart invoice parser. Your job is to extract key fields from OCR text that may come from **any country**, **any language**, and **any layout or format**.
 
-Instructions:
-- Auto-detect the language.
-- Extract values even if the layout is inconsistent or messy.
-- Currency may be in symbols (€, $, £, CHF) or abbreviations (USD, EUR, CHF, JPY, etc.).
-- Always return a consistent JSON structure with all fields below.
-- Return null if any field is missing or not detected.
+  Instructions:
+  - Auto-detect the language.
+  - Extract values even if the layout is inconsistent or messy.
+  - Currency may be in symbols (€, $, £, CHF) or abbreviations (USD, EUR, CHF, JPY, etc.).
+  - Extract the invoice line items as a list under "line_items".
+  - Each line item should have these fields: "description", "quantity", "unit_price", "total_price".
+- Parse the invoice date carefully.
+- Convert and return the invoice date strictly in ISO 8601 format: "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM:SS" (24-hour clock).
+- Do NOT return dates in any other format.
+- If the original date/time is ambiguous or contains extra characters, clean and normalize it.
+- Return null if a valid date cannot be extracted or parsed.
+- Return null for any field that is missing or not detected.
 
-OCR Text:
-\"\"\"
-{text}
-\"\"\"
+  OCR Text:
+  \"\"\"
+  {text}
+  \"\"\"
 
-Return JSON ONLY in this exact format:
-{{
-  "vendor_name": "...",
-  "invoice_number": "...",
-  "invoice_date": "...",
-  "total_amount": {{
-    "value": ...,         
-    "currency": "..."     
-  }},
-  "tax": {{
-    "value": ...,         
-    "currency": "..."     
+  Return JSON ONLY in this exact format:
+  {{
+    "vendor_name": "...",
+    "invoice_number": "...",
+    "invoice_date": "...",
+    "total_amount": {{
+      "value": ...,         
+      "currency": "..."     
+    }},
+    "tax": {{
+      "value": ...,         
+      "currency": "..."     
+    }},
+    "line_items": [
+      {{
+        "description": "...",
+        "quantity": ...,
+        "unit_price": ...,
+        "total_price": ...
+      }}
+    ]
   }}
-}}
-"""
+  """
+
 
     try:
         logger.debug(f"Token count: {count_tokens(prompt)}")
