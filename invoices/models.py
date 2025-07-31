@@ -1,42 +1,113 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
+
 
 class Invoice(models.Model):
+    # Define possible statuses as constants
     STATUS_PENDING = 'pending'
     STATUS_PROCESSING = 'processing'
-    STATUS_COMPLETED = 'completed'
+    STATUS_PROCESSED = 'processed'
     STATUS_FAILED = 'failed'
 
     STATUS_CHOICES = [
         (STATUS_PENDING, 'Pending'),
         (STATUS_PROCESSING, 'Processing'),
-        (STATUS_COMPLETED, 'Completed'),
+        (STATUS_PROCESSED, 'Processed'),
         (STATUS_FAILED, 'Failed'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='invoices')
-    original_file = models.FileField(upload_to='invoices/')  # saved in media/invoices/
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-    processed = models.BooleanField(default=False)  # OCR+AI done?
-    processed_at = models.DateTimeField(null=True, blank=True)
+    # Use settings.AUTH_USER_MODEL for flexibility (in case you switch to a custom user model)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='invoices',
+        help_text="Owner of this invoice"
+    )
+    original_file = models.FileField(
+        upload_to='invoices/',
+        help_text="Original uploaded invoice file"
+    )
+    uploaded_at = models.DateTimeField(
+        auto_now_add=True,
+        help_text="Timestamp when the invoice was uploaded"
+    )
+    processed = models.BooleanField(
+        default=False,
+        help_text="Flag to indicate if OCR and AI parsing have completed"
+    )
+    processed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Timestamp when processing finished"
+    )
+    processing_error = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Error message if processing failed"
+    )
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default=STATUS_PENDING,
-        help_text="Current status of the invoice"
+        help_text="Current processing status"
     )
 
+    class Meta:
+        ordering = ['-uploaded_at']
+        verbose_name = 'Invoice'
+        verbose_name_plural = 'Invoices'
+
     def __str__(self):
-        return f"Invoice {self.id} by {self.user.username} uploaded {self.uploaded_at} (status: {self.status})"
+        return f"Invoice {self.id} by {self.user} uploaded {self.uploaded_at.strftime('%Y-%m-%d %H:%M')} (status: {self.status})"
+
 
 class ParsedInvoiceData(models.Model):
-    invoice = models.OneToOneField(Invoice, on_delete=models.CASCADE, related_name='parsed_data')
-    vendor = models.CharField(max_length=255, blank=True, null=True)
-    invoice_date = models.DateField(blank=True, null=True)
-    total_amount = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
-    tax_amount = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
-    currency = models.CharField(max_length=10, blank=True, null=True)
-    line_items = models.JSONField(blank=True, null=True)  # list of dicts, e.g., [{item, qty, price}]
+    invoice = models.OneToOneField(
+        Invoice,
+        on_delete=models.CASCADE,
+        related_name='parsed_data',
+        help_text="Invoice this parsed data belongs to"
+    )
+    vendor = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Vendor or supplier name"
+    )
+    invoice_date = models.DateField(
+        blank=True,
+        null=True,
+        help_text="Date on the invoice"
+    )
+    total_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        help_text="Total invoice amount"
+    )
+    tax_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        help_text="Tax amount on the invoice"
+    )
+    currency = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        help_text="Currency code (e.g., USD, EUR)"
+    )
+    line_items = models.JSONField(
+        blank=True,
+        null=True,
+        help_text="List of line items, each with details like description, quantity, price"
+    )
+
+    class Meta:
+        verbose_name = 'Parsed Invoice Data'
+        verbose_name_plural = 'Parsed Invoice Data'
 
     def __str__(self):
         return f"Parsed data for Invoice {self.invoice.id}"

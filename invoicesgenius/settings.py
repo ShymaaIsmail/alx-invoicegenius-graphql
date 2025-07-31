@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 from decouple import config
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -43,7 +44,8 @@ INSTALLED_APPS = [
     # Third-party
     'graphene_django',
     'graphql_jwt.refresh_token',
-
+    'django_celery_results',
+    'django_celery_beat',
     # Local apps
     'authentication',
     'invoices',
@@ -133,11 +135,13 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+
 # CSRF settings
 CSRF_TRUSTED_ORIGINS = [
     "chrome-extension://flnheeellpciglgpaodhkhmapeljopja"
 ]
 GOOGLE_CLIENT_ID = config('GOOGLE_CLIENT_ID', default='your-google-client-id')
+OPENAI_API_KEY= config('OPENAI_API_KEY', default='your-openai-api-key')
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
@@ -164,3 +168,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Media files settings
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+#Celery settings
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
