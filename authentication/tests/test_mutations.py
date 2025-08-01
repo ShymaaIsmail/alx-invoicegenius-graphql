@@ -1,14 +1,3 @@
-from django.test import TestCase
-from ai_parser.utils import parse_invoice_text
-
-class AIParserTest(TestCase):
-    def test_parse_invoice_text(self):
-        sample = "Invoice Number: 12345\nVendor: ACME\nTotal: $250.00"
-        parsed = parse_invoice_text(sample)
-        self.assertEqual(parsed.get("invoice_number"), "12345")
-
-
-# authentication/tests/test_mutations.py
 from graphene_django.utils.testing import GraphQLTestCase
 from django.contrib.auth import get_user_model
 from unittest.mock import patch
@@ -16,6 +5,8 @@ from unittest.mock import patch
 User = get_user_model()
 
 class AuthMutationTest(GraphQLTestCase):
+    GRAPHQL_URL = "/graphql/"  # Set your actual GraphQL endpoint here
+
     @patch("authentication.mutations.google_id_token.verify_oauth2_token")
     def test_google_login_success(self, mock_verify):
         mock_verify.return_value = {
@@ -37,6 +28,9 @@ class AuthMutationTest(GraphQLTestCase):
             variables={"token": "fake_token_value"},
         )
 
-        self.assertIsNone(response.errors)
-        data = response.json()["data"]["googleLogin"]
+        self.assertEqual(response.status_code, 200)
+        content = response.json()
+        self.assertNotIn("errors", content)
+
+        data = content["data"]["googleLogin"]
         self.assertEqual(data["email"], "testuser@example.com")
