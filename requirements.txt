@@ -58,3 +58,6 @@ pytesseract==0.3.10
 django-celery-results>=2.5.1
 django-celery-beat>=2.5.0
 python-dateutil==2.9.0.post0
+django-filter==25.1
+django-cors-headers==3.18.0
+django-redis==5.2.0

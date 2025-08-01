@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'graphql_jwt.refresh_token',
     'django_celery_results',
     'django_celery_beat',
+    'django_filters',
     # Local apps
     'authentication',
     'invoices',

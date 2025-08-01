@@ -1,22 +1,38 @@
+# invoices/queries.py or invoices/schema.py
+
 import graphene
 from graphql_jwt.decorators import login_required
-from .types import InvoiceType
-from .models import Invoice
+from graphene_django.filter import DjangoFilterConnectionField
+from invoices.models import Invoice
+from invoices.types import InvoiceType, InvoiceNode
+from invoices.filters import InvoiceFilter
 
 
 class InvoiceQuery(graphene.ObjectType):
-    """Authenticated queries for accessing user invoices."""
-    my_invoices = graphene.List(InvoiceType)
-    invoice = graphene.Field(InvoiceType, id=graphene.ID(required=True))
+    """Authenticated GraphQL queries for accessing user invoices."""
+
+    # Relay-compatible list with filtering
+    my_invoices = DjangoFilterConnectionField(
+        InvoiceNode,
+        filterset_class=InvoiceFilter,
+        description="List of invoices uploaded by the logged-in user with filters"
+    )
+
+    # Standard (non-relay) single invoice by ID
+    invoice = graphene.Field(
+        InvoiceType,
+        id=graphene.ID(required=True),
+        description="Fetch a specific invoice by ID"
+    )
 
     @login_required
-    def resolve_my_invoices(self, info):
+    def resolve_my_invoices(self, info, **kwargs):
         user = info.context.user
         return (
             Invoice.objects
             .filter(user=user)
             .order_by('-uploaded_at')
-            .prefetch_related('parsed_data')  # safe to prefetch; won't error if null
+            .select_related('parsed_data')
         )
 
     @login_required
@@ -25,11 +41,11 @@ class InvoiceQuery(graphene.ObjectType):
         invoice = (
             Invoice.objects
             .filter(id=id, user=user)
-            .select_related('parsed_data')  # will work only if parsed_data exists
+            .select_related('parsed_data')
             .first()
         )
 
-        # If not processed, ignore parsed_data (optional logic)
         if invoice and not invoice.processed:
-            invoice.parsed_data = None  # hide parsed_data if not processed
+            invoice.parsed_data = None  # Hide parsed data until processed
+
         return invoice

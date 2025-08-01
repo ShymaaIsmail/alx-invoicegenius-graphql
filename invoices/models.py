@@ -56,6 +56,10 @@ class Invoice(models.Model):
         ordering = ['-uploaded_at']
         verbose_name = 'Invoice'
         verbose_name_plural = 'Invoices'
+        indexes = [
+            models.Index(fields=["status"]),
+            models.Index(fields=["uploaded_at"]),
+        ]
 
     def __str__(self):
         return f"Invoice {self.id} by {self.user} uploaded {self.uploaded_at.strftime('%Y-%m-%d %H:%M')} (status: {self.status})"
