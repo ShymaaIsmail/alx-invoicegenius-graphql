@@ -5,14 +5,13 @@ import logging
 import json
 from django.conf import settings
 
+logger = logging.getLogger(__name__)
+openai.api_key = settings.OPENAI_API_KEY
+
+
 def count_tokens(prompt, model="gpt-3.5-turbo"):
     encoding = tiktoken.encoding_for_model(model)
     return len(encoding.encode(prompt))
-
-logger = logging.getLogger(__name__)
-
-openai.api_key = settings.OPENAI_API_KEY
-
 
 def parse_invoice_text(text):
     logger.info(f"OPENAI_API_KEY loaded: {openai.api_key}")
@@ -24,14 +23,15 @@ def parse_invoice_text(text):
   - Auto-detect the language.
   - Extract values even if the layout is inconsistent or messy.
   - Currency may be in symbols (€, $, £, CHF) or abbreviations (USD, EUR, CHF, JPY, etc.).
+  - Always return a consistent JSON structure with all fields below.
   - Extract the invoice line items as a list under "line_items".
   - Each line item should have these fields: "description", "quantity", "unit_price", "total_price".
-- Parse the invoice date carefully.
-- Convert and return the invoice date strictly in ISO 8601 format: "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM:SS" (24-hour clock).
-- Do NOT return dates in any other format.
-- If the original date/time is ambiguous or contains extra characters, clean and normalize it.
-- Return null if a valid date cannot be extracted or parsed.
-- Return null for any field that is missing or not detected.
+  - Parse the invoice date carefully.
+  - Convert and return the invoice date strictly in ISO 8601 format: "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM:SS" (24-hour clock).
+  - Do NOT return dates in any other format.
+  - If the original date/time is ambiguous or contains extra characters, clean and normalize it.
+  - Return null if a valid date cannot be extracted or parsed.
+  - Return null for any field that is missing or not detected.
 
   OCR Text:
   \"\"\"

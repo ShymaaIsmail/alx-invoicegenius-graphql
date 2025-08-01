@@ -57,3 +57,4 @@ Pillow==10.0.0
 pytesseract==0.3.10
 django-celery-results>=2.5.1
 django-celery-beat>=2.5.0
+python-dateutil==2.9.0.post0
