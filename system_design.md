@@ -131,7 +131,8 @@ InvoiceGenius is designed to allow users to upload invoice or receipt documents 
 
 ## 9. External Services
 
-* OpenAI API or HuggingFace for AI parsing
+* Google Authentication
+* OpenAI API for AI parsing
 * Redis (task broker)
 
 ---
