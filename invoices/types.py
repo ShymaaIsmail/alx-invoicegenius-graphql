@@ -30,6 +30,8 @@ class ParsedInvoiceDataType(DjangoObjectType):
 class InvoiceType(DjangoObjectType):
     parsed_data = graphene.Field(ParsedInvoiceDataType)
     download_filename = graphene.String()
+    is_valid_invoice = graphene.Boolean()
+
 
     class Meta:
         model = Invoice
@@ -47,8 +49,16 @@ class InvoiceType(DjangoObjectType):
             return request.build_absolute_uri(self.original_file.url)
         return None
 
+    def resolve_is_valid_invoice(self, info):
+        parsed = self.parsed_data
+        if not parsed:
+            return False
+        return bool(parsed.vendor and parsed.invoice_date and parsed.total_amount)
+
 class InvoiceNode(DjangoObjectType):
     download_filename = graphene.String()
+    is_valid_invoice = graphene.Boolean()
+
     class Meta:
         model = Invoice
         interfaces = (relay.Node,)
@@ -63,5 +73,12 @@ class InvoiceNode(DjangoObjectType):
             return request.build_absolute_uri(self.original_file.url)
         return None
 
-    
+    def resolve_is_valid_invoice(self, info):
+        parsed = self.parsed_data
+        if not parsed:
+            return False
+        return bool(parsed.vendor and parsed.invoice_date and parsed.total_amount)
+
+
+
 
