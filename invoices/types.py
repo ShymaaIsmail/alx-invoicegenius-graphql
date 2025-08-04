@@ -29,6 +29,7 @@ class ParsedInvoiceDataType(DjangoObjectType):
 
 class InvoiceType(DjangoObjectType):
     parsed_data = graphene.Field(ParsedInvoiceDataType)
+    download_filename = graphene.String()
 
     class Meta:
         model = Invoice
@@ -40,8 +41,14 @@ class InvoiceType(DjangoObjectType):
         except ParsedInvoiceData.DoesNotExist:
             return None
 
+    def resolve_download_filename(self, info):
+        request = info.context
+        if self.original_file and request:
+            return request.build_absolute_uri(self.original_file.url)
+        return None
 
 class InvoiceNode(DjangoObjectType):
+    download_filename = graphene.String()
     class Meta:
         model = Invoice
         interfaces = (relay.Node,)
@@ -49,3 +56,12 @@ class InvoiceNode(DjangoObjectType):
         filter_fields = {
             'status': ['exact'],
         }
+    
+    def resolve_download_filename(self, info):
+        request = info.context
+        if self.original_file and request:
+            return request.build_absolute_uri(self.original_file.url)
+        return None
+
+    
+
