@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-# Exit if any command fails
-set -o errexit
+#!/bin/bash
+set -e
 
-export POETRY_ACTIVE=0 
+export POETRY_ACTIVE=0
 
 echo "🔧 Using Python version  d ddddd: $(python --version)"
 

@@ -20,8 +20,8 @@ services:
     env: python
     pythonVersion: 3.10.12     # ← Add it here too
     buildFilter: null
-    buildCommand: pip install --upgrade pip setuptools wheel && pip install -r requirements.txt
-    startCommand: celery -A invoicesgenius worker --loglevel=info
+    buildCommand: ./build.sh
+    startCommand: celery -A invoicesgenius worker --loglevel=debug
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: invoicesgenius.settings
