@@ -12,6 +12,7 @@ from invoices.utils import compute_file_hash
 
 
 class UploadInvoice(graphene.Mutation):
+    """Mutation to upload an invoice file."""
     class Arguments:
         file = Upload(required=True)
 
@@ -48,4 +49,5 @@ class UploadInvoice(graphene.Mutation):
         return UploadInvoice(success=True, message="Invoice uploaded successfully.", invoice=invoice)
 
 class UploadInvoiceMutation(graphene.ObjectType):
+    """GraphQL mutation for uploading an invoice."""
     upload_invoice = UploadInvoice.Field()

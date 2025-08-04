@@ -15,12 +15,15 @@ User = get_user_model()
 
 # Helper to generate token using the current JWT settings
 def generate_token(user):
+    """Generate a JWT token for the user."""
     payload = jwt_settings.JWT_PAYLOAD_HANDLER(user)
     return jwt_encode(payload)
 
 
 class GoogleLogin(graphene.Mutation):
+    """Mutation to log in a user using Google ID token."""
     class Arguments:
+        """Arguments for the Google login mutation."""
         id_token_str = graphene.String(required=True)
 
     token = graphene.String()
@@ -33,6 +36,7 @@ class GoogleLogin(graphene.Mutation):
 
     @classmethod
     def mutate(cls, root, info, id_token_str):
+        """Mutate method to handle Google login."""
         try:
             idinfo = google_id_token.verify_oauth2_token(
                 id_token_str, google_requests.Request(), settings.GOOGLE_CLIENT_ID
@@ -73,6 +77,7 @@ class GoogleLogin(graphene.Mutation):
 
 
 class Logout(graphene.Mutation):
+    """Mutation to log out a user by revoking their refresh token."""
     success = graphene.Boolean()
 
     class Arguments:
@@ -89,6 +94,8 @@ class Logout(graphene.Mutation):
 
 
 class AuthMutation(graphene.ObjectType):
+    """Authentication mutations for the GraphQL API."""
+    # JWT mutations
     token_auth = graphql_jwt.ObtainJSONWebToken.Field()
     verify_token = graphql_jwt.Verify.Field()
     refresh_token = graphql_jwt.Refresh.Field()

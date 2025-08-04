@@ -23,6 +23,7 @@ def normalize_date(date_str):
 
 @shared_task
 def process_invoice_file(invoice_id):
+    """Process an invoice file by extracting text and parsing it."""
     logger.info(f"Starting processing of invoice ID: {invoice_id}")
 
     try:

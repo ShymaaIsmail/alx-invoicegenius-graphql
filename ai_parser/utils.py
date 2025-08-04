@@ -5,15 +5,18 @@ import logging
 import json
 from django.conf import settings
 
+# Configure logging
 logger = logging.getLogger(__name__)
 openai.api_key = settings.OPENAI_API_KEY
 
 
 def count_tokens(prompt, model="gpt-3.5-turbo"):
+    """Count the number of tokens in a prompt for the specified OpenAI model."""
     encoding = tiktoken.encoding_for_model(model)
     return len(encoding.encode(prompt))
 
 def parse_invoice_text(text):
+    """Parse the invoice text using OpenAI's GPT model to extract structured data."""
     logger.info(f"OPENAI_API_KEY loaded: {openai.api_key}")
 
     prompt = f"""

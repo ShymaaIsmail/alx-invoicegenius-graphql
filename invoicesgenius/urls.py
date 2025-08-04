@@ -21,11 +21,13 @@ from django.urls import path
 from django.views.decorators.csrf import csrf_exempt
 from graphene_file_upload.django import FileUploadGraphQLView
 
+"""GraphQL endpoint for handling file uploads and queries"""
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("graphql/", csrf_exempt(FileUploadGraphQLView.as_view(graphiql=True))),
 
 ]
 
+"""Static and media files configuration for development"""
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

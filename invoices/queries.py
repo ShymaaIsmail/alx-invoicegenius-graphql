@@ -27,6 +27,7 @@ class InvoiceQuery(graphene.ObjectType):
 
     @login_required
     def resolve_my_invoices(self, info, **kwargs):
+        """Resolve the list of invoices for the authenticated user."""
         user = info.context.user
         return (
             Invoice.objects
@@ -37,6 +38,7 @@ class InvoiceQuery(graphene.ObjectType):
 
     @login_required
     def resolve_invoice(self, info, id):
+        """Resolve a single invoice by ID for the authenticated user."""
         user = info.context.user
         invoice = (
             Invoice.objects
@@ -45,7 +47,7 @@ class InvoiceQuery(graphene.ObjectType):
             .first()
         )
 
-        if invoice and not invoice.processed:
-            invoice.parsed_data = None  # Hide parsed data until processed
+        if invoice and (not invoice.is_valid_invoice or not invoice.processed):
+            invoice.parsed_data = None
 
         return invoice

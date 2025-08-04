@@ -1,6 +1,7 @@
 # invoices/utils.py
 import hashlib
 
+"""Utility functions for invoice processing."""
 
 def compute_file_hash(file_content: bytes) -> str:
     """Generate SHA256 hash from file content bytes."""

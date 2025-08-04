@@ -2,6 +2,9 @@ from django.db import models
 from invoices.models import Invoice
 
 class AIParsingJob(models.Model):
+    """"Model representing a job for parsing an invoice using AI.
+    This model stores the details of the parsing job, including the invoice it is associated with,
+    the status of the job, and any parsed fields or error messages."""
     invoice = models.OneToOneField(Invoice, on_delete=models.CASCADE, related_name='ai_parsing_job')
     started_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, blank=True)
