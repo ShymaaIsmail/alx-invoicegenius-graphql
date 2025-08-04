@@ -125,7 +125,7 @@ python manage.py createsuperuser
 python manage.py runserver
 
 # In a new terminal (for background worker)
-celery -A invoicegenius worker -l info
+celery -A invoicegenius worker -l debug
 
 
 sudo apt install tesseract-ocr
