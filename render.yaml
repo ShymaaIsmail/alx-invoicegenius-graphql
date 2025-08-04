@@ -7,12 +7,22 @@ services:
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: invoicesgenius.settings
-      - key: SECRET_KEY
-        value: your-secret-key
-      - key: DATABASE_URL
-        fromDatabase:
-          name: invoicesgenius-db
-          property: connectionString
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: CELERY_BROKER_URL
+        sync: false
 
   - type: worker
     name: invoicesgenius-celery
@@ -22,5 +32,19 @@ services:
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: invoicesgenius.settings
-      - key: SECRET_KEY
-        value: your-secret-key
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: CELERY_BROKER_URL
+        sync: false
