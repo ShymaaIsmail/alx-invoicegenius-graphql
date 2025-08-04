@@ -19,6 +19,7 @@ services:
     name: invoicesgenius-celery
     env: python
     pythonVersion: 3.10.12     # ← Add it here too
+    buildFilter: null
     buildCommand: pip install --upgrade pip setuptools wheel && pip install -r requirements.txt
     startCommand: celery -A invoicesgenius worker --loglevel=info
     envVars:

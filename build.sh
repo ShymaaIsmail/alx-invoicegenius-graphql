@@ -3,6 +3,8 @@
 # Exit if any command fails
 set -o errexit
 
+export POETRY_ACTIVE=0 
+
 echo "🔧 Using Python version  d ddddd: $(python --version)"
 
 # Upgrade pip and setup tools
