@@ -3,6 +3,8 @@ from django.conf import settings
 
 
 class Invoice(models.Model):
+    """Model representing an invoice."""
+    file_hash = models.CharField(max_length=64, unique=True, null=True, blank=True)  # SHA256 hash of file
     # Define possible statuses as constants
     STATUS_PENDING = 'pending'
     STATUS_PROCESSING = 'processing'
