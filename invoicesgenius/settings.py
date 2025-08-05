@@ -29,8 +29,13 @@ SECRET_KEY = 'django-insecure-6my!l*-qw9m08cg2_)(re(tvni&yb8k755jzrqz#nj2^dpgkbx
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['https://shymaaismail-alx-invoicegenius-graphql.onrender.com', 'localhost', '127.0.0.1']
 
+# CORS settings
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://shymaaismail-alx-invoicegenius-graphql.onrender.com",
+]
 
 # Application definition
 
@@ -161,6 +166,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
