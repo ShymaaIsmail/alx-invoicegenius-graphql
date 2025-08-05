@@ -190,7 +190,8 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
-
+SITE_DOMAIN = config("SITE_DOMAIN", default="http://localhost:8000")
+# 
 # GraphQL JWT settings
 GRAPHQL_JWT = {
     "JWT_EXPIRATION_DELTA": timedelta(hours=1),

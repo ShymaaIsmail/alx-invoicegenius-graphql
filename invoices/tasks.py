@@ -1,5 +1,6 @@
 import logging
 import mimetypes
+from django.conf import settings
 import requests
 from tempfile import NamedTemporaryFile
 from celery import shared_task
@@ -11,6 +12,11 @@ from ai_parser.utils import parse_invoice_text
 
 logger = logging.getLogger(__name__)
 
+
+def get_download_filename(invoice):
+    if invoice.original_file:
+        return f"{settings.SITE_DOMAIN}{invoice.original_file.url}"
+    return None
 
 def normalize_date(date_str):
     if not date_str:
@@ -29,7 +35,7 @@ def process_invoice_file(invoice_id):
 
     try:
         invoice = Invoice.objects.get(id=invoice_id)
-        file_url = invoice.downloadFilename
+        file_url = get_download_filename(invoice)
         logger.info(f"Downloading invoice file from: {file_url}")
 
         response = requests.get(file_url)
