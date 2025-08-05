@@ -145,7 +145,9 @@ AUTHENTICATION_BACKENDS = [
 
 # CSRF settings
 CSRF_TRUSTED_ORIGINS = [
-    "chrome-extension://flnheeellpciglgpaodhkhmapeljopja"
+    "chrome-extension://flnheeellpciglgpaodhkhmapeljopja",
+    "https://shymaaismail-alx-invoicegenius-graphql.onrender.com",
+    "http://localhost:3000",
 ]
 GOOGLE_CLIENT_ID = config('GOOGLE_CLIENT_ID', default='your-google-client-id')
 OPENAI_API_KEY= config('OPENAI_API_KEY', default='your-openai-api-key')
@@ -165,8 +167,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
