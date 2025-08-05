@@ -15,6 +15,7 @@ RUN pip install -r requirements.txt
 
 # Copy project files
 COPY . .
+RUN chmod +x start.sh
 
 # Expose port
 EXPOSE 8000
