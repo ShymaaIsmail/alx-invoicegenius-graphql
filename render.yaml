@@ -28,7 +28,7 @@ services:
     name: invoicesgenius-celery
     env: docker
     dockerfilePath: ./Dockerfile
-    startCommand: celery -A invoicesgenius worker --loglevel=info
+    startCommand: celery -A invoicesgenius worker --loglevel=debug
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: invoicesgenius.settings
