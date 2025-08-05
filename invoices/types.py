@@ -59,7 +59,8 @@ class InvoiceType(DjangoObjectType):
         parsed = self.parsed_data
         if not parsed:
             return False
-        return bool(parsed.vendor and parsed.invoice_date and parsed.total_amount)
+        return bool(parsed.get("vendor") and parsed.get("invoice_date") and parsed.get("total_amount"))
+
 
 class InvoiceNode(DjangoObjectType):
     """Relay-compatible GraphQL type for Invoice model."""
@@ -86,7 +87,7 @@ class InvoiceNode(DjangoObjectType):
         parsed = self.parsed_data
         if not parsed:
             return False
-        return bool(parsed.vendor and parsed.invoice_date and parsed.total_amount)
+        return bool(parsed.get("vendor") and parsed.get("invoice_date") and parsed.get("total_amount"))
 
 
 
