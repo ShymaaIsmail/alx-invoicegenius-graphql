@@ -1,5 +1,7 @@
 import logging
 import mimetypes
+import requests
+from tempfile import NamedTemporaryFile
 from celery import shared_task
 from dateutil.parser import parse
 from django.utils import timezone
@@ -11,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 
 def normalize_date(date_str):
-    """Convert a messy date string to YYYY-MM-DD format."""
     if not date_str:
         return None
     try:
@@ -21,29 +22,39 @@ def normalize_date(date_str):
         logger.error(f"Failed to parse date: {date_str}")
         return None
 
+
 @shared_task
 def process_invoice_file(invoice_id):
-    """Process an invoice file by extracting text and parsing it."""
     logger.info(f"Starting processing of invoice ID: {invoice_id}")
 
     try:
         invoice = Invoice.objects.get(id=invoice_id)
-        logger.info(f"Invoice found: ID={invoice.id}, file={invoice.original_file}")
+        file_url = invoice.downloadFilename
+        logger.info(f"Downloading invoice file from: {file_url}")
 
-        file_path = invoice.original_file.path
-        mime_type, _ = mimetypes.guess_type(file_path)
-        logger.info(f"Detected MIME type: {mime_type}")
-
-        # Extract text based on file type
-        if mime_type == "application/pdf":
-            text = extract_text_from_pdf(file_path)
-        elif mime_type and mime_type.startswith("image/"):
-            text = extract_text_from_image(file_path)
-        else:
-            msg = f"Unsupported MIME type: {mime_type}"
+        response = requests.get(file_url)
+        if response.status_code != 200:
+            msg = f"Failed to download invoice file. HTTP {response.status_code}"
             logger.warning(msg)
             _mark_invoice_failed(invoice, msg)
             return
+
+        with NamedTemporaryFile(delete=True, suffix=".pdf") as tmp_file:
+            tmp_file.write(response.content)
+            tmp_file.flush()
+
+            mime_type, _ = mimetypes.guess_type(tmp_file.name)
+            logger.info(f"Detected MIME type: {mime_type}")
+
+            if mime_type == "application/pdf":
+                text = extract_text_from_pdf(tmp_file.name)
+            elif mime_type and mime_type.startswith("image/"):
+                text = extract_text_from_image(tmp_file.name)
+            else:
+                msg = f"Unsupported MIME type: {mime_type}"
+                logger.warning(msg)
+                _mark_invoice_failed(invoice, msg)
+                return
 
         if not text:
             msg = "No text extracted from the invoice file."
@@ -53,7 +64,7 @@ def process_invoice_file(invoice_id):
 
         logger.info(f"Parsing extracted text...{text}")
         parsed_data = parse_invoice_text(text)
-        #parsed_data= {'vendor_name': 'Berghotel', 'invoice_number': '4572', 'invoice_date': '30. 07. 2007/13:29: 17', 'total_amount': {'value': 54.5, 'currency': 'CHF'}, 'tax': {'value': 3.85, 'currency': 'CHF'}, 'line_items': [{'description': 'Latte Macchiato', 'quantity': 2, 'unit_price': 4.5, 'total_price': 9.0}, {'description': 'Gloki', 'quantity': 1, 'unit_price': 6.0, 'total_price': 6.0}, {'description': 'Schweinschnitzel', 'quantity': 1, 'unit_price': 22.0, 'total_price': 22.0}, {'description': 'Chasspatz', 'quantity': 14, 'unit_price': None, 'total_price': None}]}
+
         if not parsed_data:
             msg = "AI parsing failed: no data extracted from text."
             logger.warning(msg)
@@ -61,20 +72,18 @@ def process_invoice_file(invoice_id):
             return
 
         logger.info(f"Parsed data: {parsed_data}")
-
-        # Extract nested data safely
         total = parsed_data.get("total_amount", {})
         tax = parsed_data.get("tax", {})
 
         ParsedInvoiceData.objects.create(
-        invoice=invoice,
-        vendor=parsed_data.get("vendor_name"),
-        invoice_date= normalize_date(parsed_data.get("invoice_date")),
-        total_amount=total.get("value"),
-        tax_amount=tax.get("value"),
-        currency=total.get("currency") or tax.get("currency"),
-        line_items= parsed_data.get("line_items") or []
-    )
+            invoice=invoice,
+            vendor=parsed_data.get("vendor_name"),
+            invoice_date=normalize_date(parsed_data.get("invoice_date")),
+            total_amount=total.get("value"),
+            tax_amount=tax.get("value"),
+            currency=total.get("currency") or tax.get("currency"),
+            line_items=parsed_data.get("line_items") or [],
+        )
 
         invoice.status = Invoice.STATUS_PROCESSED
         invoice.processed = True
@@ -91,7 +100,6 @@ def process_invoice_file(invoice_id):
 
 
 def _mark_invoice_failed(invoice, error_message):
-    """Helper to update invoice with failure status."""
     invoice.status = Invoice.STATUS_FAILED
     invoice.processing_error = error_message
     invoice.processed = False
