@@ -15,5 +15,9 @@ END
 echo "📦 Collecting static files..."
 python manage.py collectstatic --noinput
 
+echo "🔥 Starting Celery worker in background..."
+celery -A invoicesgenius worker --loglevel=debug &
+
+
 echo "🔥 Starting server..."
 exec gunicorn invoicesgenius.wsgi:application --bind 0.0.0.0:$PORT
