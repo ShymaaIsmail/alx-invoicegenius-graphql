@@ -16,7 +16,7 @@ echo "📦 Collecting static files..."
 python manage.py collectstatic --noinput
 
 echo "🔥 Starting Celery worker in background..."
-celery -A invoicesgenius worker --loglevel=info --concurrency=1
+celery -A invoicesgenius worker --loglevel=info --concurrency=1 &
 
 
 echo "🔥 Starting server..."
