@@ -30,16 +30,29 @@ def normalize_date(date_str):
         return None
 
 
-@shared_task
-def process_invoice_file(invoice_id):
+@shared_task(bind=True, max_retries=2, default_retry_delay=60)
+def process_invoice_file(self, invoice_id):
     logger.info(f"Starting processing of invoice ID: {invoice_id}")
+    invoice = None
 
     try:
         invoice = Invoice.objects.get(id=invoice_id)
-        file_url = get_download_filename(invoice)
-        logger.info(f"Downloading invoice file from: {file_url}")
 
+        # Skip if already processed or failed
+        if invoice.status in [Invoice.STATUS_PROCESSED, Invoice.STATUS_FAILED]:
+            logger.info(f"Skipping invoice {invoice.id} as it is already {invoice.status}")
+            return
+
+        file_url = get_download_filename(invoice)
+        if not file_url:
+            msg = "No file URL available for invoice."
+            logger.warning(msg)
+            _mark_invoice_failed(invoice, msg)
+            return
+
+        logger.info(f"Downloading invoice file from: {file_url}")
         response = requests.get(file_url)
+
         if response.status_code != 200:
             msg = f"Failed to download invoice file. HTTP {response.status_code}"
             logger.warning(msg)
@@ -54,7 +67,7 @@ def process_invoice_file(invoice_id):
             tmp_file.write(response.content)
             tmp_file.flush()
 
-            # If Content-Type not available, fallback to guessing from file name
+            # Guess MIME type
             mime_type = content_type or mimetypes.guess_type(file_url)[0]
             logger.info(f"Resolved MIME type: {mime_type}")
 
@@ -109,7 +122,10 @@ def process_invoice_file(invoice_id):
         logger.error(f"Invoice with ID {invoice_id} does not exist.")
     except Exception as e:
         logger.exception(f"Unexpected error while processing invoice {invoice_id}: {e}")
-        _mark_invoice_failed(invoice, str(e))
+        if invoice:
+            _mark_invoice_failed(invoice, str(e))
+        # If you want to retry, uncomment the next line:
+        # raise self.retry(exc=e)
 
 
 def _mark_invoice_failed(invoice, error_message):
