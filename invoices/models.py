@@ -1,6 +1,8 @@
 from django.db import models
 from django.conf import settings
+from storages.backends.s3boto3 import S3Boto3Storage
 
+s3_storage = S3Boto3Storage()
 
 class Invoice(models.Model):
     """Model representing an invoice."""
@@ -27,6 +29,7 @@ class Invoice(models.Model):
     )
     original_file = models.FileField(
         upload_to='invoices/',
+        storage=s3_storage,
         help_text="Original uploaded invoice file"
     )
     uploaded_at = models.DateTimeField(
