@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # invoices/types.py
 
 import graphene

@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 import os
 import fitz  # PyMuPDF
 from PIL import Image

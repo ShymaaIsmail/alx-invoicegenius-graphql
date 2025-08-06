@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import logging
 import mimetypes
 from django.conf import settings
