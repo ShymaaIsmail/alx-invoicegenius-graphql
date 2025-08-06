@@ -235,4 +235,3 @@ def _mark_invoice_failed(invoice, error_message):
     invoice.processed_at = timezone.now()
     invoice.save()
     logger.info(f"Invoice {invoice.id} marked as FAILED: {error_message}")
->>>>>>> c3962c0 (feat: use AWS S3 for storing uploaded invoices)

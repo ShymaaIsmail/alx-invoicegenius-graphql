@@ -52,4 +52,3 @@ def extract_text_from_image(file_path):
 
     image = Image.open(full_path)
     return pytesseract.image_to_string(image)
->>>>>>> c3962c0 (feat: use AWS S3 for storing uploaded invoices)

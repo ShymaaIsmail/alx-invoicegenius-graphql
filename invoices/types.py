@@ -155,4 +155,3 @@ class InvoiceNode(DjangoObjectType):
 
 
 
->>>>>>> c3962c0 (feat: use AWS S3 for storing uploaded invoices)

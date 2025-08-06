@@ -418,4 +418,3 @@ AWS_QUERYSTRING_AUTH = False
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
 
->>>>>>> c3962c0 (feat: use AWS S3 for storing uploaded invoices)

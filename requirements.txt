@@ -124,4 +124,3 @@ gunicorn
 tiktoken>=0.5.1
 boto3==1.34.102
 django-storages==1.14.2
->>>>>>> c3962c0 (feat: use AWS S3 for storing uploaded invoices)
