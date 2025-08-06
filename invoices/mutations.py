@@ -2,7 +2,6 @@
 from graphene_file_upload.scalars import Upload
 import graphene
 from graphql_jwt.decorators import login_required
-from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from invoices.models import Invoice
 from invoices.types import InvoiceType
@@ -22,6 +21,8 @@ class UploadInvoice(graphene.Mutation):
 
     @login_required
     def mutate(self, info, file, **kwargs):
+        """Handle the file upload and create an Invoice instance."""
+        from django.core.files.storage import default_storage
         user = info.context.user
 
         if not file.name.lower().endswith((".pdf", ".png", ".jpg", ".jpeg")):

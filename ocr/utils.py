@@ -2,11 +2,12 @@ import os
 import fitz  # PyMuPDF
 from PIL import Image
 import pytesseract
-from django.core.files.storage import default_storage
 
 
 def extract_text_from_pdf(file_path):
     """Extract text from a PDF file using PyMuPDF."""
+    from django.core.files.storage import default_storage
+
     text = ""
 
     full_path = file_path if os.path.isabs(file_path) else default_storage.path(file_path)
