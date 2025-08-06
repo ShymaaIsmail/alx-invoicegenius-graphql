@@ -32,7 +32,6 @@ class ParsedInvoiceDataType(DjangoObjectType):
 class InvoiceType(DjangoObjectType):
     """GraphQL type for Invoice model with additional fields."""
     parsed_data = graphene.Field(ParsedInvoiceDataType)
-    download_filename = graphene.String()
     is_valid_invoice = graphene.Boolean()
 
 
@@ -47,13 +46,6 @@ class InvoiceType(DjangoObjectType):
         except ParsedInvoiceData.DoesNotExist:
             return None
 
-    def resolve_download_filename(self, info):
-        """Return the download URL for the invoice file."""
-        request = info.context
-        if self.original_file and request:
-            return request.build_absolute_uri(self.original_file.url)
-        return None
-
     def resolve_is_valid_invoice(self, info):
         """Check if the invoice has valid parsed data."""
         parsed = self.parsed_data
@@ -64,7 +56,6 @@ class InvoiceType(DjangoObjectType):
 
 class InvoiceNode(DjangoObjectType):
     """Relay-compatible GraphQL type for Invoice model."""
-    download_filename = graphene.String()
     is_valid_invoice = graphene.Boolean()
 
     class Meta:
@@ -74,13 +65,6 @@ class InvoiceNode(DjangoObjectType):
         filter_fields = {
             'status': ['exact'],
         }
-    
-    def resolve_download_filename(self, info):
-        """Return the download URL for the invoice file."""
-        request = info.context
-        if self.original_file and request:
-            return request.build_absolute_uri(self.original_file.url)
-        return None
 
     def resolve_is_valid_invoice(self, info):
         """Check if the invoice has valid parsed data."""
