@@ -1,6 +1,5 @@
 import logging
 import mimetypes
-from django.conf import settings
 import requests
 from tempfile import NamedTemporaryFile
 from celery import shared_task
@@ -14,9 +13,11 @@ logger = logging.getLogger(__name__)
 
 
 def get_download_filename(invoice):
+    """Return the full URL to the invoice file (e.g., from S3)."""
     if invoice.original_file:
-        return f"{settings.SITE_DOMAIN}{invoice.original_file.url}"
+        return invoice.original_file.url  # S3 URL already includes full domain
     return None
+
 
 def normalize_date(date_str):
     if not date_str:
@@ -45,13 +46,19 @@ def process_invoice_file(invoice_id):
             _mark_invoice_failed(invoice, msg)
             return
 
-        with NamedTemporaryFile(delete=True, suffix=".pdf") as tmp_file:
+        # Detect mime type from response headers
+        content_type = response.headers.get("Content-Type", "")
+        logger.info(f"Detected HTTP Content-Type: {content_type}")
+
+        with NamedTemporaryFile(delete=True, suffix=".tmp") as tmp_file:
             tmp_file.write(response.content)
             tmp_file.flush()
 
-            mime_type, _ = mimetypes.guess_type(tmp_file.name)
-            logger.info(f"Detected MIME type: {mime_type}")
+            # If Content-Type not available, fallback to guessing from file name
+            mime_type = content_type or mimetypes.guess_type(file_url)[0]
+            logger.info(f"Resolved MIME type: {mime_type}")
 
+            # OCR logic
             if mime_type == "application/pdf":
                 text = extract_text_from_pdf(tmp_file.name)
             elif mime_type and mime_type.startswith("image/"):
@@ -68,7 +75,7 @@ def process_invoice_file(invoice_id):
             _mark_invoice_failed(invoice, msg)
             return
 
-        logger.info(f"Parsing extracted text...{text}")
+        logger.info(f"Parsing extracted text... {text}")
         parsed_data = parse_invoice_text(text)
 
         if not parsed_data:

@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'django_celery_results',
     'django_celery_beat',
     'django_filters',
+    'corsheaders',
+    'storages',
     # Local apps
     'authentication',
     'invoices',
@@ -190,9 +192,18 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
-SITE_DOMAIN = config("SITE_DOMAIN", default="http://localhost:8000")
 # 
 # GraphQL JWT settings
 GRAPHQL_JWT = {
     "JWT_EXPIRATION_DELTA": timedelta(hours=1),
 }
+
+#S3 settings
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', default='your-aws-access-key-id')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', default='your-aws-secret-access-key')
+AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME', default='your-s3-bucket-name')
+AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME', default='us-east-1')
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+AWS_DEFAULT_ACL = None
+AWS_QUERYSTRING_AUTH = False 
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
