@@ -48,10 +48,10 @@ class InvoiceType(DjangoObjectType):
 
     def resolve_is_valid_invoice(self, info):
         """Check if the invoice has valid parsed data."""
-        parsed = self.parsed_data
-        if not parsed:
+        if not hasattr(self, "parsed_data"):
             return False
-        return bool(parsed.get("vendor") and parsed.get("invoice_date") and parsed.get("total_amount"))
+        parsed = self.parsed_data
+        return bool(parsed.vendor and parsed.invoice_date and parsed.total_amount)
 
 
 class InvoiceNode(DjangoObjectType):
@@ -68,10 +68,10 @@ class InvoiceNode(DjangoObjectType):
 
     def resolve_is_valid_invoice(self, info):
         """Check if the invoice has valid parsed data."""
-        parsed = self.parsed_data
-        if not parsed:
+        if not hasattr(self, "parsed_data"):
             return False
-        return bool(parsed.get("vendor") and parsed.get("invoice_date") and parsed.get("total_amount"))
+        parsed = self.parsed_data
+        return bool(parsed.vendor and parsed.invoice_date and parsed.total_amount)
 
 
 
