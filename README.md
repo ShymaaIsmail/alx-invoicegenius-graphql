@@ -56,7 +56,7 @@ This project showcases real-world backend engineering with asynchronous processi
 
 ## 🗃️ ERD & Data Models
 
-📌 [Link to ERD Diagram](https://link-to-your-erd)
+📌 [Link to ERD Diagram]([[./docs/erd]])
 
 - **User**
 - **InvoiceFile**: Holds uploaded files and metadata
