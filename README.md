@@ -56,7 +56,8 @@ This project showcases real-world backend engineering with asynchronous processi
 
 ## 🗃️ ERD & Data Models
 
-📌 [Link to ERD Diagram]([[./docs/erd]])
+📌 [Link to ERD Diagram](https://github.com/ShymaaIsmail/alx-invoicegenius-graphql/tree/main/docs/erd)
+
 
 - **User**
 - **InvoiceFile**: Holds uploaded files and metadata
@@ -68,35 +69,21 @@ This project showcases real-world backend engineering with asynchronous processi
 
 ### Upload an Invoice
 ```graphql
-mutation {
-  uploadInvoice(file: Upload!) {
-    invoiceFile {
+mutation UploadInvoice($file: Upload!) {
+  uploadInvoice(file: $file) {
+    message
+    success
+    invoice {
       id
-      filename
-      status
+      originalFile
+      processed
+      uploadedAt
+      processedAt
     }
   }
 }
 ```
-
-### Fetch Parsed Results
-```graphql
-query {
-  myInvoices {
-    id
-    fileUrl
-    status
-    parsedData {
-      vendor
-      invoiceDate
-      tax
-      total
-    }
-  }
-}
-```
-
-### Authenticate (Token)
+### Admin users Authenticate (Token)
 ```graphql
 mutation {
   tokenAuth(username: "user", password: "pass") {
@@ -104,7 +91,22 @@ mutation {
   }
 }
 ```
+### Google users Authenticate (Token)
+```graphql
+mutation {
+  googleLogin(idTokenStr: "google_token") {
+  email
+    firstName
+    lastName
+    refreshToken
+    token
+    userId
+    username
+  }
+}
 
+```
+📌 For more available queries and mutations, please import  the Altair collection here (https://github.com/ShymaaIsmail/alx-invoicegenius-graphql/blob/main/docs/altair_alx_invoicesgenius_apis_collection.agc)
 ---
 
 ## 🛠 Installation & Setup
@@ -118,7 +120,7 @@ source venv/bin/activate
 
 pip install -r requirements.txt
 
-cp .env.example .env  # Add keys: OPENAI_API_KEY, REDIS_URL, etc.
+cp .env.example .env  # Add keys: OPENAI_API_KEY, DB_NAME, etc.
 
 python manage.py migrate
 python manage.py createsuperuser
@@ -127,7 +129,7 @@ python manage.py runserver
 # In a new terminal (for background worker)
 celery -A invoicegenius worker -l debug
 
-
+### System Installation Requirement: 
 sudo apt install tesseract-ocr
 
 ```
@@ -156,8 +158,12 @@ sudo apt install tesseract-ocr
 
 ## 🌐 Hosted API
 
-🌍 [Live GraphQL Playground](https://invoicegenius.onrender.com/graphql/)  
-🔐 Use token header: `Authorization: Token <your_token>`
+🌍 [Live GraphQL Playground](https://shymaaismail-alx-invoicegenius-graphql.onrender.com/graphql/)  
+🔐 Use token header: `Authorization: JWT <your_token>`
+
+🌍 [Live Admin Dashboard](https://shymaaismail-alx-invoicegenius-graphql.onrender.com/admin)  
+🔐 User Name and password are available in the presentation slides
+
 
 ---
 
