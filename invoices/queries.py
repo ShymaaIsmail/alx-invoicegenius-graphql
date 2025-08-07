@@ -47,7 +47,7 @@ class InvoiceQuery(graphene.ObjectType):
             .first()
         )
 
-        if invoice and (not invoice.is_valid_invoice or not invoice.processed):
+        if invoice and (not invoice.processed):
             invoice.parsed_data = None
 
         return invoice

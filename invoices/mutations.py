@@ -28,7 +28,7 @@ class UploadInvoice(graphene.Mutation):
         file_content = file.read()
         file_hash = compute_file_hash(file_content)
 
-        existing = Invoice.objects.filter(file_hash=file_hash).first()
+        existing = Invoice.objects.filter(file_hash=file_hash, user=user).first()
         if existing:
             return UploadInvoice(success=False, message="Invoice already exists.", invoice=existing)
 
