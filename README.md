@@ -64,7 +64,7 @@ This project showcases real-world backend engineering with asynchronous processi
 | `invoices/`              | Handles invoice uploads, parsing, and GraphQL API.                     |
 | `invoicesgenius/`        | Django app housing configurations, settings, and entry points.         |
 | `ocr/`                   | Contains OCR extraction code using tools like PyMuPDF/Tesseract.       |
-| `tests/`                 | Centralized location for unit tests.                   |
+| `tests/`                 | tests folder in each django app unit tests.                   |
 | `Dockerfile` & `render.yaml` & `start.sh`| Empower containerization, migrations, background processing, and production readiness. |
 
 
@@ -186,7 +186,7 @@ InvoiceGenius is built with deployment and scalability in mind:
 ---
 ## 📹 Demo Video
 
-🎥 [Watch Demo](https://link-to-your-demo-video)
+🎥 [Watch Demo](https://youtu.be/sE7vLYlGAOM))
 
 ---
 ## 🌐 Hosted API
