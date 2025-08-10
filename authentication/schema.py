@@ -28,9 +28,4 @@ class Mutation(AuthMutation, graphene.ObjectType):
 schema = graphene.Schema(
     query=Query,
     mutation=Mutation,
-    description=(
-        "Authentication API for the InvoiceGenius GraphQL backend.\n\n"
-        "Provides JWT-based authentication, Google login integration, "
-        "and user profile access for the currently authenticated account."
-    )
 )
