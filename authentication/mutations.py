@@ -13,30 +13,44 @@ from google.oauth2 import id_token as google_id_token
 
 User = get_user_model()
 
+
 # Helper to generate token using the current JWT settings
 def generate_token(user):
-    """Generate a JWT token for the user."""
+    """Generate a JWT access token for the given user."""
     payload = jwt_settings.JWT_PAYLOAD_HANDLER(user)
     return jwt_encode(payload)
 
 
 class GoogleLogin(graphene.Mutation):
-    """Mutation to log in a user using Google ID token."""
-    class Arguments:
-        """Arguments for the Google login mutation."""
-        id_token_str = graphene.String(required=True)
+    """
+    Log in a user using a Google ID token.
 
-    token = graphene.String()
-    refresh_token = graphene.String()
-    username = graphene.String()
-    user_id = graphene.ID()
-    email = graphene.String()
-    first_name = graphene.String()
-    last_name = graphene.String()
+    This mutation:
+    - Verifies the provided Google ID token against your app's `GOOGLE_CLIENT_ID`.
+    - Creates a new user account if one doesn't already exist for the Google account.
+    - Returns an access token and refresh token for authenticated requests.
+    """
+
+    class Arguments:
+        id_token_str = graphene.String(
+            required=True,
+            description=(
+                "The Google ID token obtained from the Google Sign-In flow. "
+                "Must be verified against your configured Google client ID."
+            )
+        )
+
+    token = graphene.String(description="JWT access token for authenticated API calls.")
+    refresh_token = graphene.String(description="JWT refresh token for obtaining new access tokens.")
+    username = graphene.String(description="The username of the authenticated user.")
+    user_id = graphene.ID(description="The unique database ID of the user.")
+    email = graphene.String(description="The email address of the authenticated user.")
+    first_name = graphene.String(description="The first name of the user.")
+    last_name = graphene.String(description="The last name of the user.")
 
     @classmethod
     def mutate(cls, root, info, id_token_str):
-        """Mutate method to handle Google login."""
+        """Authenticate a user with Google and return tokens and profile information."""
         try:
             idinfo = google_id_token.verify_oauth2_token(
                 id_token_str, google_requests.Request(), settings.GOOGLE_CLIENT_ID
@@ -54,7 +68,6 @@ class GoogleLogin(graphene.Mutation):
                 },
             )
 
-            # Set unusable password if user just created (no login with password)
             if created:
                 user.set_unusable_password()
                 user.save()
@@ -77,11 +90,19 @@ class GoogleLogin(graphene.Mutation):
 
 
 class Logout(graphene.Mutation):
-    """Mutation to log out a user by revoking their refresh token."""
-    success = graphene.Boolean()
+    """
+    Log out a user by revoking their refresh token.
+
+    This mutation invalidates the provided refresh token so it can no longer be used
+    to obtain new access tokens.
+    """
+    success = graphene.Boolean(description="True if the token was successfully revoked.")
 
     class Arguments:
-        refresh_token = graphene.String(required=True)
+        refresh_token = graphene.String(
+            required=True,
+            description="The refresh token to revoke."
+        )
 
     @classmethod
     def mutate(cls, root, info, refresh_token):
@@ -94,11 +115,29 @@ class Logout(graphene.Mutation):
 
 
 class AuthMutation(graphene.ObjectType):
-    """Authentication mutations for the GraphQL API."""
-    # JWT mutations
-    token_auth = graphql_jwt.ObtainJSONWebToken.Field()
-    verify_token = graphql_jwt.Verify.Field()
-    refresh_token = graphql_jwt.Refresh.Field()
-    revoke_token = graphql_jwt.Revoke.Field()
-    google_login = GoogleLogin.Field()
-    logout = Logout.Field()
+    """
+    Root authentication mutations for the InvoiceGenius GraphQL API.
+
+    Provides:
+    - Standard JWT authentication (obtain, verify, refresh, revoke)
+    - Google login integration
+    - Token-based logout
+    """
+    token_auth = graphql_jwt.ObtainJSONWebToken.Field(
+        description="Authenticate with username and password to obtain a JWT token."
+    )
+    verify_token = graphql_jwt.Verify.Field(
+        description="Verify the validity of a JWT token."
+    )
+    refresh_token = graphql_jwt.Refresh.Field(
+        description="Obtain a new access token using a valid refresh token."
+    )
+    revoke_token = graphql_jwt.Revoke.Field(
+        description="Revoke a refresh token to prevent further use."
+    )
+    google_login = GoogleLogin.Field(
+        description="Log in using a Google ID token."
+    )
+    logout = Logout.Field(
+        description="Log out by revoking the given refresh token."
+    )

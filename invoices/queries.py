@@ -1,5 +1,3 @@
-# invoices/queries.py or invoices/schema.py
-
 import graphene
 from graphql_jwt.decorators import login_required
 from graphene_django.filter import DjangoFilterConnectionField
@@ -9,25 +7,36 @@ from invoices.filters import InvoiceFilter
 
 
 class InvoiceQuery(graphene.ObjectType):
-    """Authenticated GraphQL queries for accessing user invoices."""
+    """
+    Authenticated GraphQL queries for retrieving and filtering invoices.
 
-    # Relay-compatible list with filtering
+    Provides:
+    - A Relay-compatible list of invoices with filtering support (`my_invoices`).
+    - A standard query for fetching a single invoice by ID (`invoice`).
+    """
+
     my_invoices = DjangoFilterConnectionField(
         InvoiceNode,
         filterset_class=InvoiceFilter,
-        description="List of invoices uploaded by the logged-in user with filters"
+        description=(
+            "Retrieve a paginated, filterable list of invoices uploaded by the logged-in user. "
+            "Supports Relay cursor-based pagination and filtering by fields such as `status`, "
+            "`uploaded_at`, or `file_hash`."
+        )
     )
 
-    # Standard (non-relay) single invoice by ID
     invoice = graphene.Field(
         InvoiceType,
-        id=graphene.ID(required=True),
-        description="Fetch a specific invoice by ID"
+        id=graphene.ID(required=True, description="The unique ID of the invoice."),
+        description="Fetch details of a specific invoice by its unique ID."
     )
 
     @login_required
     def resolve_my_invoices(self, info, **kwargs):
-        """Resolve the list of invoices for the authenticated user."""
+        """
+        Returns all invoices belonging to the authenticated user, ordered by most recent uploads.
+        Includes parsed data when available.
+        """
         user = info.context.user
         return (
             Invoice.objects
@@ -38,7 +47,12 @@ class InvoiceQuery(graphene.ObjectType):
 
     @login_required
     def resolve_invoice(self, info, id):
-        """Resolve a single invoice by ID for the authenticated user."""
+        """
+        Retrieves a single invoice by ID for the authenticated user.
+
+        If the invoice is still being processed (`processed=False`),
+        the `parsed_data` field will be `null` until processing completes.
+        """
         user = info.context.user
         invoice = (
             Invoice.objects
@@ -47,7 +61,7 @@ class InvoiceQuery(graphene.ObjectType):
             .first()
         )
 
-        if invoice and (not invoice.processed):
+        if invoice and not invoice.processed:
             invoice.parsed_data = None
 
         return invoice
