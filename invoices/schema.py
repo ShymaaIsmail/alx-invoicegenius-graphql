@@ -13,9 +13,4 @@ class Mutation(UploadInvoiceMutation, graphene.ObjectType):
 schema = graphene.Schema(
     query=Query,
     mutation=Mutation,
-    description=(
-        "InvoiceGenius GraphQL API\n\n"
-        "Use this API to upload invoices, fetch your uploaded invoices, "
-        "and view parsed invoice details. Authentication is required for all operations."
-    )
 )

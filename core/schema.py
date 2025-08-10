@@ -38,9 +38,5 @@ class Mutation(
 schema = graphene.Schema(
     query=Query,
     mutation=Mutation,
-    description=(
-        "InvoiceGenius – Smart Invoice & Receipt Parser API.\n\n"
-        "This GraphQL API lets you upload invoices, process them with OCR + AI, "
-        "and query the extracted data securely."
-    )
+
 )
